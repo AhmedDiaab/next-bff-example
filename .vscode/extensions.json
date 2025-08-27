@@ -3,7 +3,6 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "bradlc.vscode-tailwindcss",
-        "EditorConfig.EditorConfig",
-        "eamodio.gitlens"
+        "EditorConfig.EditorConfig"
     ]
 }
