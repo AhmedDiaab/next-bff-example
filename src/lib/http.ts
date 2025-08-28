@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export type HTTPClientOptions = {
     baseUrl: string;
@@ -19,7 +19,7 @@ export type RequestInitEx = {
     cache?: RequestCache;
 };
 
-export type HttpResponse<T> = {
+export type HTTPResponse<T> = {
     data: T;
     status: number;
     headers: Headers;
@@ -27,9 +27,9 @@ export type HttpResponse<T> = {
 
 class HTTPError extends Error {
     status?: number;
-    response?: HttpResponse<unknown>;
+    response?: HTTPResponse<unknown>;
 
-    constructor(message: string, status?: number, response?: HttpResponse<unknown>) {
+    constructor(message: string, status?: number, response?: HTTPResponse<unknown>) {
         super(message);
         this.name = "HTTPError";
         this.status = status;
@@ -37,7 +37,7 @@ class HTTPError extends Error {
     }
 }
 
-export class HttpClient {
+export class HTTPClient {
     private baseUrl: string;
     private defaultHeaders: Record<string, string>;
     private retries: number;
@@ -78,7 +78,7 @@ export class HttpClient {
         return this.request<T>("DELETE", path, init);
     }
 
-    private async request<T>(method: HttpMethod, path: string, init: RequestInitEx = {}): Promise<HttpResponse<T>> {
+    private async request<T>(method: HTTPMethod, path: string, init: RequestInitEx = {}): Promise<HTTPResponse<T>> {
         const url = this.buildUrl(path, init.query);
         const headers = this.buildHeaders(init);
         const body = init.json !== undefined ? JSON.stringify(init.json) : undefined;
@@ -170,7 +170,7 @@ export class HttpClient {
     }
 
     private shouldRetryError(error: unknown, attempt: number, maxAttempts: number): boolean {
-        const isAbortError = (error as any)?.name === "AbortError" || (error as any)?.status === 408;
+        const isAbortError = (error as Record<'name', unknown>)?.name === "AbortError" || (error as  Record<'status', unknown>)?.status === 408;
         return attempt < maxAttempts - 1 && (isAbortError || this.isNetworkError(error));
     }
 
@@ -183,6 +183,6 @@ export class HttpClient {
     }
 
     private isNetworkError(error: unknown): boolean {
-        return error instanceof TypeError || (error as any)?.name === "FetchError";
+        return error instanceof TypeError || (error as  Record<'name', unknown>)?.name === "FetchError";
     }
 }
